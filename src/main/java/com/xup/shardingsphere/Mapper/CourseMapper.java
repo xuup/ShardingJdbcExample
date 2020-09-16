@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 @Mapper
 public interface CourseMapper{
 
-    @Insert("insert into course (cname, user_id, cstatus) values (#{cname}, #{userId}, #{cstatus})")
+    @Insert("insert into t_order (cname, user_id, cstatus) values (#{cname}, #{userId}, #{cstatus})")
     public void intsert(@Param("cname")String cname, @Param("userId")Long userId, @Param("cstatus")String status);
+
+
 
 }

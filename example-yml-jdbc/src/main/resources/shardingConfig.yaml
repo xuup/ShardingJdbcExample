@@ -1,0 +1,42 @@
+# 配置真实数据源
+dataSources:
+  # 配置第 1 个数据源
+  ds0: !!com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/edu_db_1?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  # 配置第 2 个数据源
+  ds1: !!com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/edu_db_2?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+
+shardingRule:
+# 配置分片规则
+  tables:
+    t_course:
+      actualDataNodes: ds${0..1}.course_${1..2}
+      # 配置分库策略
+      databaseStrategy:
+        inline:
+          shardingColumn: user_id
+          algorithmExpression: ds${user_id % 2}
+      # 配置分表策略
+      tableStrategy:
+        inline:
+          shardingColumn: cid
+          algorithmExpression: course_${cid % 2 + 1}   # 这里不能写成ds${0..1}.course_${cid % 2 + 1}，是个坑！！！
+
+      keyGenerator:
+        column: cid
+        type: SNOWFLAKE
+
+  bindingTables:
+    - t_course
+
+  defaultDataSourceName: ds0
+
+props:
+  sql.show: true
