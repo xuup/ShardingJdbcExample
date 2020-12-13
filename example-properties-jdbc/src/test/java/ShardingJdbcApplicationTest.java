@@ -1,4 +1,5 @@
 import com.xup.sharding.ShardingJdbcApplication;
+import org.apache.shardingsphere.api.hint.HintManager;
 import org.apache.shardingsphere.shardingjdbc.jdbc.core.connection.ShardingConnection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +47,62 @@ public class ShardingJdbcApplicationTest {
         resultSet.close();
         statement.close();
         connection.close();
+    }
 
+
+    @Test
+    public void testRangeSharding() throws SQLException {
+        String sql = "select * from course where user_id between 1 and 10 ";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            logger.info(resultSet.getObject(1)+"");
+        }
+
+        resultSet.close();
+        statement.close();
+        connection.close();
+    }
+
+
+    @Test
+    public void testComplexSharding() throws SQLException {
+        String sql = "select * from course where user_id = 12 and cstatus = 1 ";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            logger.info(resultSet.getObject(1)+"");
+        }
+
+        resultSet.close();
+        statement.close();
+        connection.close();
+    }
+
+    @Test
+    public void testHintSharding() throws SQLException {
+
+        HintManager.clear();
+        HintManager hintManager = HintManager.getInstance();
+        //hintManager.setDatabaseShardingValue(3);
+        hintManager.addDatabaseShardingValue("course",1);
+        hintManager.addTableShardingValue("course",1);
+
+        //hintManager.setMasterRouteOnly();
+
+        String sql = "select * from course";
+        Connection connection = dataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()){
+            logger.info(resultSet.getObject(1)+"");
+        }
+
+        resultSet.close();
+        statement.close();
+        connection.close();
     }
 
 }

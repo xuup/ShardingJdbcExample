@@ -14,10 +14,14 @@ public class MyPreciseShardingAlgorithm implements PreciseShardingAlgorithm {
     @Override
     public String doSharding(Collection collection, PreciseShardingValue preciseShardingValue) {
 
-        logger.info("------algorithm------");
-        logger.info(collection.size() + "");
-        logger.info("分片键:{}", preciseShardingValue);
 
-        return null;
+        for(Object databaseName: collection){
+            if (databaseName.toString().endsWith((Integer)preciseShardingValue.getValue()%2 + "")){
+                logger.info("路由至ds{}", (Integer)preciseShardingValue.getValue()%2);
+                return databaseName.toString();
+            }
+        }
+
+        throw new IllegalArgumentException();
     }
 }
